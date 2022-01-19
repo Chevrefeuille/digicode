@@ -1,13 +1,9 @@
-import {
-  SafeAreaView,
-  FlatList,
-  ListRenderItem,
-  StyleSheet,
-  View,
-  Text,
-} from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { FlatList, StyleSheet, View, Text } from "react-native";
+import { SearchBar } from "react-native-elements";
+
 import * as Contacts from "expo-contacts";
+import { debounce } from "lodash";
 
 const ContactItem = ({ contact }: { contact: Contacts.Contact }) => (
   <View style={styles.item}>
@@ -20,6 +16,7 @@ export default function ContactList() {
     Contacts.Contact[]
   >([]);
   const [contacts, setContacts] = useState<Contacts.Contact[]>([]);
+  const [keyword, setKeyword] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -31,6 +28,7 @@ export default function ContactList() {
 
         if (data.length > 0) {
           setContacts(data);
+          setDisplayedContacts(data);
         }
       }
     })();
@@ -40,14 +38,47 @@ export default function ContactList() {
     <ContactItem contact={item}></ContactItem>
   );
 
+  const searchContact = useCallback(
+    debounce((keyword) => {
+      if (keyword == "") {
+        setDisplayedContacts(contacts);
+      } else {
+        const filteredContacts = contacts.filter((contact) => {
+          return contact.name.toLowerCase().includes(keyword.toLowerCase());
+        });
+        setDisplayedContacts(filteredContacts);
+      }
+    }, 100),
+    [contacts]
+  );
+
+  const inputSearchContact = (keyword?: string) => {
+    if (keyword === undefined) {
+      return;
+    }
+    setKeyword(keyword);
+    searchContact(keyword);
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <SearchBar
+        placeholder="Find contact by name ..."
+        platform="android"
+        // inputContainerStyle={{ backgroundColor: "#e9e9e9" }}
+        // containerStyle={{ backgroundColor: "transparent" }}
+        // lightTheme={true}
+        // round={true}
+        value={keyword}
+        onChangeText={inputSearchContact}
+      />
+
       <FlatList
-        data={contacts}
+        data={displayedContacts}
         renderItem={renderContactItem}
         keyExtractor={(contact: Contacts.Contact) => contact.id}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 

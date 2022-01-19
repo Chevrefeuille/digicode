@@ -1,14 +1,48 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { SafeAreaView, FlatList, ListRenderItem, StyleSheet, View, Text } from 'react-native';
+import * as Contacts from 'expo-contacts';
+
+const ContactItem = ({contact}:{contact: Contacts.Contact}) => (
+  <View style={styles.item}>
+    <Text style={styles.title}>{contact.name}</Text>
+  </View>
+);
 
 export default function App() {
+  const [displayedContacts, setDisplayedContacts] = useState<Contacts.Contact[]>([]);
+  const [contacts, setContacts] = useState<Contacts.Contact[]>([]);
+
+  const renderContactItem = ({item}: {item: Contacts.Contact}) => (
+    <ContactItem contact={item}></ContactItem>
+  );
+
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Contacts.requestPermissionsAsync();
+      if (status === 'granted') {
+        const { data } = await Contacts.getContactsAsync({
+          fields: [Contacts.Fields.Emails],
+        });
+
+        if (data.length > 0) {
+          setContacts(data);
+        }
+      }
+    })();
+  }, []);
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaView style={styles.container}>
+      <FlatList
+        data={contacts}
+        renderItem={renderContactItem}
+        keyExtractor={(contact: Contacts.Contact) => contact.id}
+      />
+    </SafeAreaView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -16,5 +50,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  item: {
+    backgroundColor: '#f9c2ff',
+    padding: 20,
+    marginVertical: 8,
+    marginHorizontal: 16,
+  },
+  title: {
+    fontSize: 32,
   },
 });

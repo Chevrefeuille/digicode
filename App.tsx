@@ -1,63 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { SafeAreaView, FlatList, ListRenderItem, StyleSheet, View, Text } from 'react-native';
-import * as Contacts from 'expo-contacts';
+import ContactList from "./src/screens/ContactList";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-const ContactItem = ({contact}:{contact: Contacts.Contact}) => (
-  <View style={styles.item}>
-    <Text style={styles.title}>{contact.name}</Text>
-  </View>
-);
+import { View, StyleSheet } from "react-native";
+
+const Tab = createBottomTabNavigator();
 
 export default function App() {
-  const [displayedContacts, setDisplayedContacts] = useState<Contacts.Contact[]>([]);
-  const [contacts, setContacts] = useState<Contacts.Contact[]>([]);
-
-  const renderContactItem = ({item}: {item: Contacts.Contact}) => (
-    <ContactItem contact={item}></ContactItem>
-  );
-
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await Contacts.requestPermissionsAsync();
-      if (status === 'granted') {
-        const { data } = await Contacts.getContactsAsync({
-          fields: [Contacts.Fields.Emails],
-        });
-
-        if (data.length > 0) {
-          setContacts(data);
-        }
-      }
-    })();
-  }, []);
-
   return (
-    <SafeAreaView style={styles.container}>
-      <FlatList
-        data={contacts}
-        renderItem={renderContactItem}
-        keyExtractor={(contact: Contacts.Contact) => contact.id}
-      />
-    </SafeAreaView>
+    <NavigationContainer>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarStyle: { borderColor: "red", paddingBottom: 10, height: 60 },
+          tabBarActiveTintColor: "tomato",
+          tabBarInactiveTintColor: "gray",
+        })}
+      >
+        <Tab.Screen name="Contacts" component={ContactList} />
+        <Tab.Screen name="Near me" component={ContactList} />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  item: {
-    backgroundColor: '#f9c2ff',
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
-  },
-  title: {
-    fontSize: 32,
+    padding: 200,
   },
 });

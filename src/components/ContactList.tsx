@@ -1,9 +1,14 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { FlatList, StyleSheet, View, Text } from "react-native";
 import { SearchBar } from "react-native-elements";
-
 import * as Contacts from "expo-contacts";
 import { debounce } from "lodash";
+
+import { useAppSelector, useAppDispatch } from "../store/hooks";
+import {
+  fetchContacts,
+  setDisplayedContacts,
+} from "../store/features/contacts/contactsSlice";
 
 const ContactItem = ({ contact }: { contact: Contacts.Contact }) => (
   <View style={styles.item}>
@@ -12,27 +17,15 @@ const ContactItem = ({ contact }: { contact: Contacts.Contact }) => (
 );
 
 export default function ContactList() {
-  const [displayedContacts, setDisplayedContacts] = useState<
-    Contacts.Contact[]
-  >([]);
-  const [contacts, setContacts] = useState<Contacts.Contact[]>([]);
   const [keyword, setKeyword] = useState("");
+  const dispatch = useAppDispatch();
+
+  const displayedContacts = useAppSelector((state) => state.displayedContacts);
+  const contacts = useAppSelector((state) => state.contacts);
 
   useEffect(() => {
-    (async () => {
-      const { status } = await Contacts.requestPermissionsAsync();
-      if (status === "granted") {
-        const { data } = await Contacts.getContactsAsync({
-          fields: [Contacts.Fields.Emails],
-        });
-
-        if (data.length > 0) {
-          setContacts(data);
-          setDisplayedContacts(data);
-        }
-      }
-    })();
-  }, []);
+    dispatch(fetchContacts());
+  }, [dispatch]);
 
   const renderContactItem = ({ item }: { item: Contacts.Contact }) => (
     <ContactItem contact={item}></ContactItem>
@@ -41,12 +34,11 @@ export default function ContactList() {
   const searchContact = useCallback(
     debounce((keyword) => {
       if (keyword == "") {
-        setDisplayedContacts(contacts);
       } else {
         const filteredContacts = contacts.filter((contact) => {
           return contact.name.toLowerCase().includes(keyword.toLowerCase());
         });
-        setDisplayedContacts(filteredContacts);
+        dispatch(setDisplayedContacts(filteredContacts));
       }
     }, 100),
     [contacts]
@@ -85,15 +77,16 @@ export default function ContactList() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
   },
   item: {
-    backgroundColor: "#f9c2ff",
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
+    backgroundColor: "gray",
+    color: "#000",
+    padding: 10,
+    marginVertical: 2,
+    marginHorizontal: 12,
+    borderRadius: 10,
   },
   title: {
     fontSize: 32,

@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { FlatList, StyleSheet, View, Text } from "react-native";
 
-import ContactList from "../components/ContactList";
+import RegisteredContactList from "../components/RegisteredContactList";
 
 export default function Codes() {
   return (
     <View style={styles.container}>
-      <ContactList></ContactList>
+      <RegisteredContactList></RegisteredContactList>
     </View>
   );
 }

@@ -4,13 +4,11 @@ import * as Contacts from "expo-contacts";
 
 export interface ContactsState {
   contacts: Contacts.Contact[];
-  displayedContacts: Contacts.Contact[];
   registeredContacts: Contacts.Contact[];
 }
 
 const initialState: ContactsState = {
   contacts: [],
-  displayedContacts: [],
   registeredContacts: [],
 };
 
@@ -30,7 +28,7 @@ export const contactsSlice = createSlice({
       state,
       action: PayloadAction<Contacts.Contact[]>
     ) => {
-      state.displayedContacts = action.payload;
+      state.contacts = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -39,7 +37,6 @@ export const contactsSlice = createSlice({
       state.registeredContacts = state.contacts.filter(
         (contact) => contact.note
       );
-      state.displayedContacts = state.registeredContacts;
     });
   },
 });

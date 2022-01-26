@@ -18,11 +18,6 @@ export async function getContacts(): Promise<Contacts.Contact[]> {
           return -1;
         }
       });
-      // data.forEach(async (contact) => {
-      //   if (contact.name == "Adrien Gregorj") {
-      //     console.log(contact);
-      //   }
-      // });
     }
     return data;
   }

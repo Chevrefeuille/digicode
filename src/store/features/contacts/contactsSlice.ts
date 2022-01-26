@@ -30,14 +30,16 @@ export const contactsSlice = createSlice({
       state,
       action: PayloadAction<Contacts.Contact[]>
     ) => {
-      console.log("here");
       state.displayedContacts = action.payload;
     },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchContacts.fulfilled, (state, action) => {
       state.contacts = action.payload;
-      state.displayedContacts = action.payload;
+      state.registeredContacts = state.contacts.filter(
+        (contact) => contact.note
+      );
+      state.displayedContacts = state.registeredContacts;
     });
   },
 });

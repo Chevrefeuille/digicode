@@ -19,7 +19,7 @@ export default function App() {
             tabBarInactiveTintColor: "gray",
           })}
         >
-          <Tab.Screen name="Contacts" component={Codes} />
+          <Tab.Screen name="Codes" component={Codes} />
           <Tab.Screen name="Near me" component={Codes} />
         </Tab.Navigator>
       </NavigationContainer>

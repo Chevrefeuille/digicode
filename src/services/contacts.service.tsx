@@ -10,7 +10,6 @@ export async function getContacts(): Promise<Contacts.Contact[]> {
         Contacts.Fields.Addresses,
       ],
     });
-
     if (data.length > 0) {
       data.sort((a, b) => {
         if (a.name >= b.name) {

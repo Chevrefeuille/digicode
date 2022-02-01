@@ -23,3 +23,14 @@ export async function getContacts(): Promise<Contacts.Contact[]> {
   }
   return [];
 }
+
+export async function addNoteToContact(
+  contact: Contacts.Contact
+): Promise<String> {
+  const { status } = await Contacts.requestPermissionsAsync();
+  if (status === "granted") {
+    const data = await Contacts.updateContactAsync(contact);
+    return data;
+  }
+  return "";
+}
